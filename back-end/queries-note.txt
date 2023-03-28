@@ -1,0 +1,7 @@
+use idealogic;
+SELECT * FROM HargaProduk a LEFT JOIN Produk b on a.id_produk = b.id
+where id_produk = 1 AND SUBSTRING(a.range_harga, 1, POSITION('-' in a.range_harga)-1) < 12 
+AND SUBSTRING(a.range_harga, POSITION('-' in a.range_harga)+1, LENGTH(a.range_harga)) > 12
+
+SELECT * from HargaProduk
+SELECT SUBSTRING(range_harga, 1, POSITION('-' in range_harga)-1) from HargaProduk
