@@ -2,7 +2,8 @@
 ## https://github.com/LuthfanM
 # Overview
 
-Project ini dibuat based on : https://docs.google.com/spreadsheets/d/1ByKSkOLIurdPgDnvWSpLBxyQe1EVfPxLSn0HLGf2oAA/edit#gid=0
+back end idealogic.
+
 ## Cara Run
 
 Masuk folder Query, run script sql (Query Table.sql) disana ke mysql workbench / dbeaver. Settingan bebas mau pakai password/tidak
