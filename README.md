@@ -1,4 +1,5 @@
-# https://github.com/LuthfanM
+# Idealogic BE
+## https://github.com/LuthfanM
 # Overview
 
 Project ini dibuat based on : https://docs.google.com/spreadsheets/d/1ByKSkOLIurdPgDnvWSpLBxyQe1EVfPxLSn0HLGf2oAA/edit#gid=0
