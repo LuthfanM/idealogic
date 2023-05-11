@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Idealogic BE
 ## https://github.com/LuthfanM
 # Overview
@@ -100,3 +101,9 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 >>>>>>> df77184 (Initialize project using Create React App)
+=======
+# https://github.com/LuthfanM
+# Overview
+
+front end
+>>>>>>> e63cddb (fe)
