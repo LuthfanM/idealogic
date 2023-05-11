@@ -105,5 +105,17 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 # https://github.com/LuthfanM
 # Overview
 
+<<<<<<< HEAD
 front end
 >>>>>>> e63cddb (fe)
+=======
+React Project for exercising
+
+how to use?
+Npm install
+Npm run start
+
+Folder soal : Folder berisi soal
+Folder jawaban : Folder berisi jawaban untuk soal test logika
+Folder lain : Folder untuk aplikasi pemprograman
+>>>>>>> b2635ba (first commit)

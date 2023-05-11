@@ -2,19 +2,19 @@ import axios from "axios";
 const API_URL = process.env.REACT_APP_API_URL;
 
 export default {
-  post: function (url, payload) {
+  post: function (url, payload, header) {
     return new Promise((resolve, reject)=>{
-        return axios.post(`${API_URL}${url}`, payload).then((response)=>{
+        return axios.post(`${API_URL}${url}`, payload, header).then((response)=>{
             return resolve(response)
         }).catch((err)=>{
             return reject(err.response)
         })
     })
   },
-  get: function (url) {
+  get: function (url, header) {
     return new Promise((resolve, reject) => {
       return axios
-        .get(`${API_URL}${url}`)
+        .get(`${API_URL}${url}`, header)
         .then((response) => {
           return resolve(response);
         })

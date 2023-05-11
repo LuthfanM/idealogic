@@ -1,166 +1,146 @@
-import { Col, Input, Row, Select, Typography } from "antd";
-import React, { useEffect } from "react";
-import { useReducer } from "react";
-import { useState } from "react";
-import Parents from "../components/Parents";
-import api from "../helpers/api";
-import { CATEGORY, PRODUCT } from "../helpers/Constants";
-import { convertIntoOptionable } from "../helpers/functions";
-import useDebounce from "../helpers/hooks/useDebounce";
-import {
-  SV_LIST_KATEGORI,
-  SV_LIST_PRODUK_BY_KATEGORI,
-  SV_SHOW_PRICE,
-} from "../helpers/uri";
+import { Col, Input, Radio, Row, Typography, DatePicker, Button } from 'antd';
+import React from 'react';
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
+import Parents from '../components/Parents';
+import api from '../helpers/api';
+import useDebounce from '../helpers/hooks/useDebounce';
+import { useLocalStorage } from '@rehooks/local-storage';
+import { SV_COMBINE_URI } from '../helpers/uri';
 
-const stateReducer = (state, action) => ({
-  ...state,
-  ...(typeof action === "function" ? action(state) : action),
-});
+const initialValues = {
+  name: '',
+  address: '',
+  gender: 'l',
+  born_date: '',
+};
 
-const FormGroup = () => {
-  const [kategoriOpt, setKategoriOpt] = useReducer(stateReducer, {
-    CATEGORY: [],
-    PRODUCT: [],
-  });
-  const [selectedOpt, setSelectedOpt] = useState(stateReducer, {
-    CATEGORY: {},
-    PRODUCT: {},
-  });
-  const [price, setPrice] = useState(0);
-  const [result, setResult] = useState(0);
-  const debouncedValue = useDebounce(price, 500);
+const FormGroup = () => {  
+  const [lcToken] = useLocalStorage('token');    
+  const navigate = useNavigate();
+  const [formValues, setFormValues] = useState(initialValues);
+  const [isStatus, setStatus] = useState('');
 
-  const onChangeOption = (value, opt) => {
-    console.log("isinya value" + opt, value);
-
-    let uri = "";
-    switch (opt) {
-      case CATEGORY:
-        uri = SV_LIST_PRODUK_BY_KATEGORI + "/" + value.value;
-        api
-          .get(uri)
-          .then((response) => {
-            setKategoriOpt((prev) => ({
-              ...prev,
-              PRODUCT: convertIntoOptionable(response.data.data, [
-                "id",
-                "nama_produk",
-              ]),
-            }));
-          })
-          .catch((err) => {
-            return console.log("error opt", err);
-          });
-        break;
-      case PRODUCT:
-        setSelectedOpt((prev) => ({
-          ...prev,
-          PRODUCT: { ...value },
-        }));
-        break;
-      default:
-        return;
+  const handleInputChange = (event, type) => {
+    if (type === 'input') {
+      const { name, value } = event.target;
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        [name]: value,
+      }));
+    } else if (type === 'date') {
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        born_date: event.b,
+      }));
+    } else {
+      const { value } = event.target;
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        gender: value,
+      }));
     }
   };
 
-  const onChangeText = (value) => {
-    setPrice(value);
-  };
+  const debouncedValue = useDebounce(formValues, 500);
+  console.log(debouncedValue);
 
-  useEffect(() => {
-    if (parseInt(debouncedValue) > 0) {
-      let payload = {
-        id_produk: selectedOpt?.PRODUCT.value,
-        amount: debouncedValue,
-      };
-      console.log("nilai payload", payload);
-      api
-        .post(SV_SHOW_PRICE, payload)
-        .then((response) => {
-          setResult(response.data.data);
-        })
-        .catch((err) => {
-          return console.log("error", err);
-        });
-      return () => {};
-    }
-  }, [debouncedValue, selectedOpt]);
-
-  useEffect(() => {
+  const addUser = () => {
     api
-      .get(SV_LIST_KATEGORI)
+      .post(SV_COMBINE_URI, formValues, {
+        headers: {
+          Authorization: `Bearer ${lcToken}`,
+        },
+      })
       .then((response) => {
-        setKategoriOpt((prev) => ({
-          ...prev,
-          CATEGORY: convertIntoOptionable(response.data.data, [
-            "id",
-            "nama_kategori",
-          ]),
-        }));
+        console.log(response);
+        if (response.data.message === 'success') {
+          toast('user berhasil dibuat');
+        }
       })
       .catch((err) => {
-        return console.log("error", err);
+        setStatus(err?.data?.detail[0]);
       });
+  };
 
-    return () => {};
-  }, []);
+  const errorDisplay = () => {
+    let arr = [];
+    for (const x in isStatus) {
+      arr.push(
+        <div>
+          {x} : {isStatus[x]}
+        </div>,
+      );
+    }
 
-  console.log("kateg", kategoriOpt);
+    return arr;
+  };
 
   return (
     <Parents isBorder>
-      <Row style={{ margin: "10px" }}>
+      <Row style={{ margin: '10px' }}>
         <Col span={12}>
-          <Typography.Text style={{ alignSelf: "center" }}>
-            Kategori Pekerjaan
+          <Typography.Text style={{ alignSelf: 'center' }}>
+            Nama
           </Typography.Text>
         </Col>
         <Col span={12}>
           <div>
-            <Select
-              style={{ width: "200px" }}
-              labelInValue
-              showSearch
-              placeholder="Pilih Kategori"
-              options={kategoriOpt?.CATEGORY}
-              onChange={(value) => onChangeOption(value, CATEGORY)}
+            <Input
+              name="name"
+              style={{ width: '200px' }}
+              placeholder="Nama"
+              onChange={(e) => handleInputChange(e, 'input')}
             />
           </div>
         </Col>
       </Row>
-      <Row style={{ margin: "10px" }}>
+      <Row style={{ margin: '10px' }}>
         <Col span={12}>
-          <Typography.Text>Nama Produk</Typography.Text>
-        </Col>
-        <Col span={12}>
-          <Select
-            style={{ width: "200px" }}
-            showSearch
-            placeholder="Pilih Produk"
-            labelInValue
-            options={kategoriOpt?.PRODUCT}
-            onChange={(value) => onChangeOption(value, PRODUCT)}
-          />
-        </Col>
-      </Row>
-      <Row style={{ margin: "10px" }}>
-        <Col span={12}>
-          <Typography.Text>Jumlah Pesanan</Typography.Text>
+          <Typography.Text>Alamat</Typography.Text>
         </Col>
         <Col span={12}>
           <Input
-            placeholder="Jumlah"
-            onChange={(e) => onChangeText(e.target.value)}
+            name="address"
+            style={{ width: '200px' }}
+            placeholder="Alamat"
+            onChange={(e) => handleInputChange(e, 'input')}
           />
         </Col>
       </Row>
-      <Row style={{ margin: "10px" }}>
+      <Row style={{ margin: '10px' }}>
         <Col span={12}>
-          <Typography.Text level={5}>Harga</Typography.Text>
+          <Typography.Text>P/W</Typography.Text>
         </Col>
-        <Col span={12}>{result.length > 0? result[0]?.harga: "Price not exist"}</Col>
+        <Col span={12}>
+          <Radio.Group
+            defaultValue={'l'}
+            onChange={(e) => handleInputChange(e)}
+            name="gender"
+          >
+            <Radio value={'l'}>Pria</Radio>
+            <Radio value={'p'}>Wanita</Radio>
+          </Radio.Group>
+        </Col>
       </Row>
+      <Row style={{ margin: '10px' }}>
+        <Col span={12}>
+          <Typography.Text level={5}>Tanggal Lahir</Typography.Text>
+        </Col>
+        <Col span={12}>
+          <DatePicker
+            name="born_date"
+            onChange={(a, b) => handleInputChange({ a, b }, 'date')}
+          />
+        </Col>
+      </Row>
+      <div>
+        <Button onClick={addUser}>Tambah User</Button>
+        <Button onClick={()=>navigate('/')}>Kembali ke awal</Button>
+      </div>
+      <Toaster />
+      {<div style={{ color: 'red' }}>{errorDisplay()}</div>}
     </Parents>
   );
 };
